@@ -2,6 +2,7 @@ package com.osio.market.domain.user.entity;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,10 +24,20 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
     private String username;
+
+    @Column(nullable = false, unique = true)
     private String phone;
+
+    @Column(nullable = false)
     private String address;
 
     @Enumerated(EnumType.STRING)
