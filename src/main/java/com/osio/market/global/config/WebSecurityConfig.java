@@ -1,6 +1,6 @@
 package com.osio.market.global.config;
 
-import com.osio.market.domain.user.repository.UserRepository;
+import com.osio.market.domain.user.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private final UserRepository repository;
+    private final UserJpaRepository repository;
 
     @Bean
     public UserDetailsService userDetailsService() {
