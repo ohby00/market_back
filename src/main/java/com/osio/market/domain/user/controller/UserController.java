@@ -18,6 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService service;
 
+    /*
+    http://localhost:8080/user/register
+    {
+        "email" : "ooo111@naver",
+        "password" : "1234",
+        "username" : "찐따소",
+        "phone" : "010-0000-0000",
+        "address" : "삼천포"
+    }
+     */
     @PostMapping("/register")
     public ResponseEntity<TokenDTO> register(
             @RequestBody RegisterDTO request
@@ -25,6 +35,13 @@ public class UserController {
         return ResponseEntity.ok(service.register(request));
     }
 
+    /*
+      http://localhost:8080/user/login
+       {
+           "email" : "ooo111@naver",
+           "password" : "1234"
+       }
+    */
     @PostMapping("/login")
     public ResponseEntity<TokenDTO> authenticate(
             @RequestBody LoginDTO request
