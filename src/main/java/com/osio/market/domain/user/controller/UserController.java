@@ -1,51 +1,47 @@
 package com.osio.market.domain.user.controller;
 
 
-import com.osio.market.domain.user.dto.LoginDTO;
-import com.osio.market.domain.user.dto.TokenDTO;
-import com.osio.market.domain.user.service.UserServiceTest;
+import com.osio.market.domain.user.entity.User;
+import com.osio.market.domain.user.service.UserService;
 import com.osio.market.domain.user.dto.RegisterDTO;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController
+import java.util.List;
+import java.util.Optional;
+
 @RequestMapping("/user")
-@RequiredArgsConstructor
+@RestController
 public class UserController {
-    private final UserServiceTest service;
 
-    @PostMapping("/register")
-    public ResponseEntity<TokenDTO> register(
-            @RequestBody RegisterDTO request
-            /*
-                http://localhost:8080/user/register
-                {
-                    "email" : "ooo111@naver",
-                    "password" : "1234",
-                    "username" : "찐따소",
-                    "phone" : "010-0000-0000",
-                    "address" : "삼천포"
-                }
-             */
-    ){
-        return ResponseEntity.ok(service.register(request));
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<TokenDTO> authenticate(
-            @RequestBody LoginDTO request
-            /*
-              http://localhost:8080/user/login
-               {
-                   "email" : "ooo111@naver",
-                   "password" : "1234"
-               }
-            */
-    ){
-        return ResponseEntity.ok(service.authenticate(request));
+    @GetMapping("/list")
+    public ResponseEntity<Object> selectUserList() {
+        List<User> userEntityList = userService.getAllUser();
+        return new ResponseEntity<>(userEntityList, HttpStatus.OK);
     }
+
+    @PostMapping("/save")
+    public ResponseEntity<Object> userSave(@RequestBody RegisterDTO registerDTO) {
+        User result = userService.saveUser(registerDTO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @PostMapping("/find/{id}")
+    public Optional<User> findId(@PathVariable("id") Long id) {
+        return userService.findByUserId(id);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Object> deleteUser(@PathVariable("id") Long id) {
+        userService.deleteUserByUserId(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
