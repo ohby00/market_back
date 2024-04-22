@@ -1,55 +1,22 @@
 package com.osio.market.domain.user.service;
 
-
-import com.osio.market.global.util.jwt.JwtService;
-import com.osio.market.domain.user.dto.LoginDTO;
-import com.osio.market.domain.user.dto.TokenDTO;
 import com.osio.market.domain.user.dto.RegisterDTO;
-import com.osio.market.domain.user.entity.Role;
 import com.osio.market.domain.user.entity.User;
-import com.osio.market.domain.user.repository.UserJpaRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
-    private final UserJpaRepository repository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
+import java.util.List;
 
-    public TokenDTO register(RegisterDTO request) {
-        var user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .username(request.getUsername())
-                .phone(request.getPhone())
-                .address(request.getAddress())
-                .role(Role.USER)
-                .build();
-        repository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        return TokenDTO.builder()
-                .token(jwtToken)
-                .build();
-    }
+public interface UserService {
 
-    public TokenDTO authenticate(LoginDTO request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
-        var user = repository.findByEmail(request.getEmail())
-                .orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-        return TokenDTO.builder()
-                .token(jwtToken)
-                .build();
-    }
+    // 사용자 회원가입
+    User saveUser(RegisterDTO registerDTO);
+
+    // 사용자 삭제
+    void deleteUserByUserId(long id);
+
+    // 사용자 수정
+    User updateUser(User user);
+
+    // 사용자 리스트 조회
+    List<User> userList();
+
 }

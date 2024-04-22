@@ -3,7 +3,7 @@ package com.osio.market.domain.user.controller;
 
 import com.osio.market.domain.user.dto.LoginDTO;
 import com.osio.market.domain.user.dto.TokenDTO;
-import com.osio.market.domain.user.service.UserService;
+import com.osio.market.domain.user.service.UserServiceTest;
 import com.osio.market.domain.user.dto.RegisterDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService service;
+    private final UserServiceTest service;
 
     @PostMapping("/register")
     public ResponseEntity<TokenDTO> register(
