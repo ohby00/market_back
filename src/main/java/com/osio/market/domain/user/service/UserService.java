@@ -7,7 +7,7 @@ import com.osio.market.domain.user.dto.TokenDTO;
 import com.osio.market.domain.user.dto.RegisterDTO;
 import com.osio.market.domain.user.entity.Role;
 import com.osio.market.domain.user.entity.User;
-import com.osio.market.domain.user.repository.UserRepository;
+import com.osio.market.domain.user.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository repository;
+    private final UserJpaRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
