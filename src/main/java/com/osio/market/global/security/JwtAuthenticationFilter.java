@@ -1,6 +1,7 @@
-package com.osio.market.config;
+package com.osio.market.global.security;
 
 
+import com.osio.market.global.util.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

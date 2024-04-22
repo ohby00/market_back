@@ -1,4 +1,4 @@
-package com.osio.market.config;
+package com.osio.market.global.util.jwt;
 
 
 import io.jsonwebtoken.Claims;

@@ -1,6 +1,6 @@
-package com.osio.market.config;
+package com.osio.market.global.config;
 
-import com.osio.market.user.UserRepository;
+import com.osio.market.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @RequiredArgsConstructor
-public class ApplicationConfig {
+public class WebSecurityConfig {
 
     private final UserRepository repository;
 

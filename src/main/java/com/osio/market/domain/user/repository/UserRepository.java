@@ -1,6 +1,7 @@
-package com.osio.market.user;
+package com.osio.market.domain.user.repository;
 
 
+import com.osio.market.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

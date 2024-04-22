@@ -1,10 +1,13 @@
-package com.osio.market.auth;
+package com.osio.market.domain.user.service;
 
 
-import com.osio.market.config.JwtService;
-import com.osio.market.user.Role;
-import com.osio.market.user.User;
-import com.osio.market.user.UserRepository;
+import com.osio.market.global.util.jwt.JwtService;
+import com.osio.market.domain.user.dto.LoginDTO;
+import com.osio.market.domain.user.dto.TokenDTO;
+import com.osio.market.domain.user.dto.RegisterDTO;
+import com.osio.market.domain.user.entity.Role;
+import com.osio.market.domain.user.entity.User;
+import com.osio.market.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,13 +16,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
+public class UserService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(RegisterRequest request) {
+    public TokenDTO register(RegisterDTO request) {
         var user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -30,12 +33,12 @@ public class AuthenticationService {
                 .build();
         repository.save(user);
         var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
+        return TokenDTO.builder()
                 .token(jwtToken)
                 .build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public TokenDTO authenticate(LoginDTO request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -45,7 +48,7 @@ public class AuthenticationService {
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
+        return TokenDTO.builder()
                 .token(jwtToken)
                 .build();
     }

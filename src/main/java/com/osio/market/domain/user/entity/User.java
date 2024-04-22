@@ -1,4 +1,4 @@
-package com.osio.market.user;
+package com.osio.market.domain.user.entity;
 
 
 import jakarta.persistence.*;
@@ -21,7 +21,7 @@ import java.util.List;
 @Table(name = "user")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String email;
     private String password;

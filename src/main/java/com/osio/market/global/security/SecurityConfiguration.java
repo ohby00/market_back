@@ -1,4 +1,4 @@
-package com.osio.market.config;
+package com.osio.market.global.security;
 
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class SecurityConfiguration {
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/auth/**")
+                .requestMatchers("/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
