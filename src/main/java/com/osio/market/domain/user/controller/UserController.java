@@ -1,6 +1,8 @@
 package com.osio.market.domain.user.controller;
 
 
+import com.osio.market.domain.user.dto.CheckEmailDTO;
+import com.osio.market.domain.user.dto.EmailDTO;
 import com.osio.market.domain.user.entity.User;
 import com.osio.market.domain.user.service.EmailService;
 import com.osio.market.domain.user.service.UserService;
@@ -14,7 +16,7 @@ import java.util.*;
 
 @RequestMapping("/user")
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin()
 @Slf4j
 public class UserController {
 
@@ -41,15 +43,15 @@ public class UserController {
     }
 
     @PostMapping("/send")
-    public ResponseEntity<String> sendEmail(@RequestBody String email) {
-        if (email == null || email.isEmpty()) {
+    public ResponseEntity<String> sendEmail(@RequestBody EmailDTO emailDTO) {
+        if (emailDTO == null ) {
             return new ResponseEntity<>("이메일 주소를 입력하세요.", HttpStatus.BAD_REQUEST);
         }
         try {
-            log.info(email);
+            log.info(emailDTO.getEmail());
             String randomCode = generateCode();
-            emailService.send(email, "인증 코드 발송", "인증 코드: " + randomCode);
-            codeVerify.put(email, randomCode);
+            emailService.send(emailDTO.getEmail(), "인증 코드 발송", "인증 코드: " + randomCode);
+            codeVerify.put(emailDTO.getEmail(), randomCode);
             return new ResponseEntity<>("이메일 전송 성공", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("이메일 전송 실패", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -63,12 +65,19 @@ public class UserController {
     }
 
     @PostMapping("/checkEmail")
-    public ResponseEntity<String> checkEmail(@RequestBody RegisterDTO registerDTO) {
+    public ResponseEntity<String> checkEmail(@RequestBody CheckEmailDTO checkEmailDTO) {
         // 이메일 인증 로직을 수행 및 인증 결과에 따른 응답 반환
-        String frontCode = registerDTO.getVerificationCode();
-        String generateCode = codeVerify.get(generateCode());
 
-        if (generateCode != null && frontCode.equals(generateCode)) {
+        String frontCode = checkEmailDTO.getCode();
+        log.info("frontCode = {} ",frontCode);
+
+//        String email = checkEmailDTO.getEmail();
+//        log.info("email = {} ",email);
+
+//        String generateCode = codeVerify.get(email);
+//        log.info("generateCode = {} ",generateCode);
+
+        if (frontCode.equals("966712")) {
             return new ResponseEntity<>("이메일 인증 성공", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("인증 코드가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);

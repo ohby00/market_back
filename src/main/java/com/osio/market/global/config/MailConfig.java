@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import java.util.Properties;
 
 @Configuration
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin()
 public class MailConfig {
 
     @Bean

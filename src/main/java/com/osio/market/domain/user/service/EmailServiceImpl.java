@@ -16,7 +16,7 @@ public class EmailServiceImpl implements EmailService{
 
     @Async
     public void send(String to, String subject, String text) {
-        log.info("Email sent");
+        log.info(to);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("comosiomarket@gmail.com");
         message.setTo(to);
