@@ -2,23 +2,30 @@ package com.osio.market.domain.user.controller;
 
 
 import com.osio.market.domain.user.entity.User;
+import com.osio.market.domain.user.service.EmailService;
 import com.osio.market.domain.user.service.UserService;
 import com.osio.market.domain.user.dto.RegisterDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequestMapping("/user")
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
+@Slf4j
 public class UserController {
 
     private final UserService userService;
+    private final EmailService emailService;
+    private final Map<String, String> codeVerify;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, EmailService emailService) {
         this.userService = userService;
+        this.emailService = emailService;
+        this.codeVerify = new HashMap<>();
     }
 
     @GetMapping("/list")
@@ -31,6 +38,45 @@ public class UserController {
     public ResponseEntity<Object> userSave(@RequestBody RegisterDTO registerDTO) {
         User result = userService.saveUser(registerDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @PostMapping("/send")
+    public ResponseEntity<String> sendEmail(@RequestBody String email) {
+        if (email == null || email.isEmpty()) {
+            return new ResponseEntity<>("이메일 주소를 입력하세요.", HttpStatus.BAD_REQUEST);
+        }
+        try {
+            log.info(email);
+            String randomCode = generateCode();
+            emailService.send(email, "인증 코드 발송", "인증 코드: " + randomCode);
+            codeVerify.put(email, randomCode);
+            return new ResponseEntity<>("이메일 전송 성공", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("이메일 전송 실패", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private String generateCode() {
+        Random random = new Random();
+        int code = 100000 + random.nextInt(900000); // 6자리 랜덤 숫자 생성 (100000 ~ 999999)
+        return String.valueOf(code);
+    }
+
+    @PostMapping("/checkEmail")
+    public ResponseEntity<String> checkEmail(@RequestBody RegisterDTO registerDTO) {
+        // 이메일 인증 로직을 수행 및 인증 결과에 따른 응답 반환
+        String frontCode = registerDTO.getVerificationCode();
+        String generateCode = codeVerify.get(generateCode());
+
+        if (generateCode != null && frontCode.equals(generateCode)) {
+            return new ResponseEntity<>("이메일 인증 성공", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("인증 코드가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private boolean validCode(String frontCode, String generateCode) {
+        return frontCode.equals(generateCode);
     }
 
     @PostMapping("/find/{id}")
