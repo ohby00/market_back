@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class CheckEmailDTO {
 
     private String code;
+    private String email;
 
 }

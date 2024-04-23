@@ -71,13 +71,13 @@ public class UserController {
         String frontCode = checkEmailDTO.getCode();
         log.info("frontCode = {} ",frontCode);
 
-//        String email = checkEmailDTO.getEmail();
-//        log.info("email = {} ",email);
+        String email = checkEmailDTO.getEmail();
+        log.info("email = {} ",email);
 
-//        String generateCode = codeVerify.get(email);
-//        log.info("generateCode = {} ",generateCode);
+        String generateCode = codeVerify.get(email);
+        log.info("generateCode = {} ",generateCode);
 
-        if (frontCode.equals("966712")) {
+        if (frontCode.equals(generateCode)) {
             return new ResponseEntity<>("이메일 인증 성공", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("인증 코드가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
