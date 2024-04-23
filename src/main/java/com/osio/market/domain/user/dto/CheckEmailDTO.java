@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CheckEmailDTO {
 
-    private String code;
     private String email;
+    private String verificationCode;
 
 }
