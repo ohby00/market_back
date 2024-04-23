@@ -1,12 +1,11 @@
 package com.osio.market.domain.user.controller;
 
 
-import com.osio.market.domain.user.dto.CheckEmailDTO;
-import com.osio.market.domain.user.dto.EmailDTO;
+import com.osio.market.domain.user.dto.*;
 import com.osio.market.domain.user.entity.User;
 import com.osio.market.domain.user.service.EmailService;
 import com.osio.market.domain.user.service.UserService;
-import com.osio.market.domain.user.dto.RegisterDTO;
+import com.osio.market.global.security.JwtLogin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +22,13 @@ public class UserController {
     private final UserService userService;
     private final EmailService emailService;
     private final Map<String, String> codeVerify;
+    private final JwtLogin jwtLogin;
 
-    public UserController(UserService userService, EmailService emailService) {
+    public UserController(UserService userService, EmailService emailService, JwtLogin jwtLogin) {
         this.userService = userService;
         this.emailService = emailService;
         this.codeVerify = new HashMap<>();
+        this.jwtLogin = jwtLogin;
     }
 
     @GetMapping("/list")
@@ -101,4 +102,19 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenDTO> login(
+            @RequestBody LoginDTO request
+            /*
+              http://localhost:8080/user/login
+               {
+                   "email" : "ooo111@naver",
+                   "password" : "1234"
+               }
+            */
+    ){
+        TokenDTO token = jwtLogin.login(request);
+        return ResponseEntity.ok(token);
+    }
 }
