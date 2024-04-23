@@ -68,7 +68,7 @@ public class UserController {
     public ResponseEntity<String> checkEmail(@RequestBody CheckEmailDTO checkEmailDTO) {
         // 이메일 인증 로직을 수행 및 인증 결과에 따른 응답 반환
 
-        String frontCode = checkEmailDTO.getCode();
+        String frontCode = checkEmailDTO.getVerificationCode();
         log.info("frontCode = {} ",frontCode);
 
         String email = checkEmailDTO.getEmail();
@@ -78,8 +78,10 @@ public class UserController {
         log.info("generateCode = {} ",generateCode);
 
         if (frontCode.equals(generateCode)) {
+            log.info(frontCode);
             return new ResponseEntity<>("이메일 인증 성공", HttpStatus.OK);
         } else {
+            log.info(frontCode);
             return new ResponseEntity<>("인증 코드가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
         }
     }
