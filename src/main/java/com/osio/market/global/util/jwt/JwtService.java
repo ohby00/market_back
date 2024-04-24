@@ -40,6 +40,7 @@ public class JwtService {
     }
 
     public String extractUsername(String token) {
+        Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
         return extractClaim(token, Claims::getSubject);
     }
 

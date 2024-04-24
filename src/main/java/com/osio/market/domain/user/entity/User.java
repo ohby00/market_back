@@ -44,6 +44,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<Orders> orders;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Cart cart;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
