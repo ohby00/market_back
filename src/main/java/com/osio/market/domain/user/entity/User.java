@@ -1,8 +1,9 @@
 package com.osio.market.domain.user.entity;
 
-
+import com.osio.market.domain.cart.entity.Cart;
+import com.osio.market.domain.order.entity.OrderDetail;
+import com.osio.market.domain.order.entity.Orders;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,11 +35,17 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String phone;
 
     @Column(nullable = false)
     private String address;
+
+    @OneToMany(mappedBy = "user")
+    private List<Orders> orders;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Cart cart;
 
     @Enumerated(EnumType.STRING)
     private Role role;
