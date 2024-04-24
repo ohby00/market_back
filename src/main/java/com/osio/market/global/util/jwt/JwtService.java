@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +17,8 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = "p*jr;2Rh;*R(xZJ}:NOt[C]}0(wlJ;g1&j4nYp<Zs\"\\U`\"$Qf4#hZ_D8;$.d]$PC";
+
+    private static final String SECRET_KEY = "ZaOhvbAdBvomPAZmhFgcDBaaDNdDBQgGBpv72m85lxj0CNczYpahT6xa0RjcsOnp";
     private static final long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 15; // 15 minutes
     private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 7 days
 
@@ -40,6 +42,7 @@ public class JwtService {
     }
 
     public String extractUsername(String token) {
+        Claims claims = Jwts.parser().setSigningKey(SECRET_KEY.getBytes()).parseClaimsJws(token).getBody();
         return extractClaim(token, Claims::getSubject);
     }
 
