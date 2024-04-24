@@ -31,26 +31,6 @@ public class JwtLogin {
         this.authenticationManager = authenticationManager;
     }
 
-    public TokenDTO register(RegisterDTO request) {
-        User user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .username(request.getUsername())
-                .phone(request.getPhone())
-                .address(request.getAddress())
-                .role(Role.USER)
-                .build();
-        userRepository.save(user);
-
-        String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-
-        return TokenDTO.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
     public TokenDTO login(LoginDTO request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
