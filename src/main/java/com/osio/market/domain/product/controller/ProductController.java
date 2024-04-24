@@ -1,6 +1,8 @@
 package com.osio.market.domain.product.controller;
 
 import com.osio.market.domain.product.dto.ProductAddDTO;
+import com.osio.market.domain.product.dto.ProductDetailListDTO;
+import com.osio.market.domain.product.dto.ProductListDTO;
 import com.osio.market.domain.product.entity.Product;
 import com.osio.market.domain.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -20,6 +21,7 @@ import java.util.Optional;
 public class ProductController {
     private final ProductService productService;
 
+    // 상품 등록
     @PostMapping("/add")
     public ResponseEntity<Object> productAdd(
             @RequestBody ProductAddDTO productAddDTO
@@ -40,23 +42,18 @@ public class ProductController {
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
+    // 상품 조회
     @GetMapping("/list")
-    public ResponseEntity<Object> productList(){
-        List<Product> productList = productService.getAllProducts();
+    public ResponseEntity<List<ProductListDTO>> productList(){
+        List<ProductListDTO> productList = productService.getAllProducts();
         return new ResponseEntity<>(productList, HttpStatus.OK);
     }
 
+    // 상품 상세 조회
     @GetMapping("/detail/{productId}")
-    public ResponseEntity<Object> productDetail(@PathVariable Long productId){
-        if (productId == null) {
-            return ResponseEntity.badRequest().body("Product ID = null");
-        }
+    public ResponseEntity<ProductDetailListDTO> productDetail(@PathVariable Long productId) {
+            ProductDetailListDTO detail = productService.getProductById(productId);
 
-        Optional<Product> product = productService.getProductById(productId);
-        if (product == null) {
-            return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(product, HttpStatus.OK);
-        }
+            return ResponseEntity.ok().body(detail);
     }
 }
