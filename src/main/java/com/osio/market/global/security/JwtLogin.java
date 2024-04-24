@@ -1,5 +1,6 @@
 package com.osio.market.global.security;
 
+import com.osio.market.domain.user.dto.EmailDTO;
 import com.osio.market.domain.user.dto.LoginDTO;
 import com.osio.market.domain.user.dto.RegisterDTO;
 import com.osio.market.domain.user.dto.TokenDTO;
@@ -46,6 +47,19 @@ public class JwtLogin {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    public EmailDTO getUserByAccessToken(String accessToken) {
+        String username = jwtService.extractUsername(accessToken);
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return convertToDTO(user);
+    }
+
+    private EmailDTO convertToDTO(User user) {
+        EmailDTO dto = new EmailDTO();
+        dto.setEmail(user.getEmail());
+        return dto;
     }
 
     public TokenDTO refreshAccessToken(String refreshToken) {

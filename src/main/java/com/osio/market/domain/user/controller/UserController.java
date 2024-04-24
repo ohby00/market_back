@@ -106,13 +106,6 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<TokenDTO> login(
             @RequestBody LoginDTO request
-            /*
-              http://localhost:8080/user/login
-               {
-                   "email" : "ooo111@naver",
-                   "password" : "1234"
-               }
-            */
     ){
         TokenDTO token = jwtLogin.login(request);
         return ResponseEntity.ok(token);
