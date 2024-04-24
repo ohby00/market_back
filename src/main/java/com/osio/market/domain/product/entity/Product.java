@@ -1,7 +1,14 @@
 package com.osio.market.domain.product.entity;
 
+import com.osio.market.domain.cart.entity.CartDetail;
+import com.osio.market.domain.order.entity.OrderDetail;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -22,7 +29,7 @@ public class Product {
     @Column(nullable = false)
     private Long productPrice;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition ="TEXT")
     private String productDetail;
 
     @Column(nullable = false)
@@ -30,4 +37,10 @@ public class Product {
 
     @Column(nullable = false)
     private Integer productStack;
+
+    @OneToMany(mappedBy = "product")
+    private List<OrderDetail> orderDetail;
+
+    @OneToMany(mappedBy = "product")
+    private List<CartDetail> cartDetail;
 }
