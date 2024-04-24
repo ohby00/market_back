@@ -35,7 +35,7 @@ public class SecurityConfiguration {
                 .csrf().disable()
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/user/**").permitAll() // 회원가입 엔드포인트를 모든 사용자에게 허용
+                                .requestMatchers("/**").permitAll() // 회원가입 엔드포인트를 모든 사용자에게 허용
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement()
