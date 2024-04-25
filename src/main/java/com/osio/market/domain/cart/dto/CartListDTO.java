@@ -14,8 +14,8 @@ public class CartListDTO {
     private Long productId;
     private String productName;
 
-    private Long productPrice;
+    private Long cartProductPrice;
     private String image;
-    private Long cartPrice;
-    private Long cartStack;
+    private Long cartTotalPrice;
+    private Long cartProductQuantity;
 }

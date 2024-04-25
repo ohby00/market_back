@@ -1,7 +1,6 @@
 package com.osio.market.domain.user.entity;
 
 import com.osio.market.domain.cart.entity.Cart;
-import com.osio.market.domain.order.entity.OrderDetail;
 import com.osio.market.domain.order.entity.Orders;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

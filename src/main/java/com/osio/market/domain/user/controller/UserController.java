@@ -39,7 +39,7 @@ public class UserController {
 
     @PostMapping("/save")
     public ResponseEntity<Object> userSave(@RequestBody RegisterDTO registerDTO) {
-        User result = userService.saveUser(registerDTO);
+        String result = userService.saveUser(registerDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

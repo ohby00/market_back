@@ -33,7 +33,7 @@ public class ProductController {
                 "productImage" : "image",
                 "productName" : "name",
                 "productPrice" : 23,
-                "productStack" : 1
+                "productQuantity" : 1
                 }
             */
     ) {
