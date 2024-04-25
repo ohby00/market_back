@@ -31,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductListDTO> list = products.stream().map(
                 product -> ProductListDTO.builder()
+                        .productId(product.getProductId())
                         .productName(product.getProductName())
                         .productCategory(product.getProductCategory())
                         .productImage(product.getProductImage())
@@ -49,6 +50,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId).orElseThrow(()
                 -> new NoSuchElementException("No item" + productId));
         return ProductDetailListDTO.builder()
+                .productId(product.getProductId())
                 .productName(product.getProductName())
                 .productCategory(product.getProductCategory())
                 .productImage(product.getProductImage())
