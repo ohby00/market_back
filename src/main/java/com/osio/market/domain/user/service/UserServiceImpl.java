@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService{
         var user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .username(request.getUsername())
+                .name(request.getName())
                 .phone(request.getPhone())
                 .address(request.getAddress())
                 .role(Role.USER)

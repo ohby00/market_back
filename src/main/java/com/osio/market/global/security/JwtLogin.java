@@ -1,13 +1,12 @@
 package com.osio.market.global.security;
 
-import com.osio.market.domain.user.dto.EmailDTO;
 import com.osio.market.domain.user.dto.LoginDTO;
 import com.osio.market.domain.user.dto.RegisterDTO;
 import com.osio.market.domain.user.dto.TokenDTO;
-import com.osio.market.domain.user.entity.Role;
 import com.osio.market.domain.user.entity.User;
 import com.osio.market.domain.user.repository.UserJpaRepository;
 import com.osio.market.global.util.jwt.JwtService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class JwtLogin {
     private final UserJpaRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -49,20 +49,27 @@ public class JwtLogin {
                 .build();
     }
 
-    public EmailDTO getUserByAccessToken(String accessToken) {
+    public RegisterDTO getUserByAccessToken(String accessToken) {
         String username = jwtService.extractUsername(accessToken);
+        log.info("username={}", username);
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return convertToDTO(user);
+        log.info("user={}", user);
+        return convertTo(user);
     }
 
-    private EmailDTO convertToDTO(User user) {
-        EmailDTO dto = new EmailDTO();
+    private RegisterDTO convertTo(User user) {
+        RegisterDTO dto = new RegisterDTO();
         dto.setEmail(user.getEmail());
+        dto.setPassword(user.getPassword());
+        dto.setName(user.getName());
+       dto.setPhone(user.getPhone());
+       dto.setAddress(user.getAddress());
+       log.info(String.valueOf(dto));
         return dto;
     }
 
-    public TokenDTO refreshAccessToken(String refreshToken) {
+    public TokenDTO refreshAccessToken(String refreshToken, String accessTokenValue) {
         String username = jwtService.extractUsername(refreshToken);
         UserDetails userDetails = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));

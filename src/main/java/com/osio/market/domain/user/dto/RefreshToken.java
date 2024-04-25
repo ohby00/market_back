@@ -9,11 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterDTO {
-    private String email;
-    private String password;
-    private String name;
-    private String phone;
-    private String address;
-    private String verificationCode;
+public class RefreshToken {
+
+    private String refreshToken;
+
 }
