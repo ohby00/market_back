@@ -15,5 +15,5 @@ public class ProductAddDTO {
     private Long productPrice;
     private String productDetail;
     private String productImage;
-    private Integer productStack;
+    private Integer productQuantity;
 }

@@ -1,6 +1,5 @@
 package com.osio.market.domain.order.entity;
 
-import com.osio.market.domain.cart.entity.Cart;
 import com.osio.market.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,11 +18,13 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
     private Timestamp orderDate;
+    private String orderStatus;
+    private Long orderTotalPrice;
 
     @ManyToOne
     @JoinColumn(name="userId")
     private User user;
 
     @OneToMany(mappedBy = "orders")
-    private List<OrderDetail> orderDetail;
+    private List<OrderProducts> orderProducts;
 }

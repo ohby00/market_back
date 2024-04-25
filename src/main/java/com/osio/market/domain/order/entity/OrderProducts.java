@@ -1,7 +1,6 @@
 package com.osio.market.domain.order.entity;
 
 import com.osio.market.domain.product.entity.Product;
-import com.osio.market.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,13 +9,12 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "orderdetail")
-public class OrderDetail {
+@Table(name = "orderProducts")
+public class OrderProducts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderDetailId;
-    private Long orderStack;
-    private String orderStatus;
+    private Long orderProductsId;
+    private Long orderQuantity;
 
     @ManyToOne
     @JoinColumn(name="productId")

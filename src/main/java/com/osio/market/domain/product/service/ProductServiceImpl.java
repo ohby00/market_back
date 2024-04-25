@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
                 .productImage(product.getProductImage())
                 .productPrice(product.getProductPrice())
                 .productDetail(product.getProductDetail())
-                .productStack(product.getProductStack())
+                .productQuantity(product.getProductQuantity())
                 .build();
     }
 
@@ -68,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
                 .productPrice(productAddDTO.getProductPrice())
                 .productDetail(productAddDTO.getProductDetail())
                 .productImage(productAddDTO.getProductImage())
-                .productStack(productAddDTO.getProductStack())
+                .productQuantity(productAddDTO.getProductQuantity())
                 .build();
         productRepository.save(product);
         return product;

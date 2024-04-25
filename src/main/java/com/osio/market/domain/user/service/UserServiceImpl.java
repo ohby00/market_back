@@ -1,6 +1,8 @@
 package com.osio.market.domain.user.service;
 
 
+import com.osio.market.domain.cart.entity.Cart;
+import com.osio.market.domain.cart.repository.CartRepository;
 import com.osio.market.domain.user.dto.RegisterDTO;
 import com.osio.market.domain.user.entity.Role;
 import com.osio.market.domain.user.entity.User;
@@ -18,10 +20,11 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService{
 
     private final UserJpaRepository jpaRepository;
+    private final CartRepository cartRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User saveUser(RegisterDTO request) {
+    public String saveUser(RegisterDTO request) {
         var user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -30,7 +33,13 @@ public class UserServiceImpl implements UserService{
                 .address(request.getAddress())
                 .role(Role.USER)
                 .build();
-        return jpaRepository.save(user);
+                jpaRepository.save(user);
+
+        Cart cart = Cart.builder()
+                .user(user)
+                .build();
+        cartRepository.save(cart);
+        return "회원가입 성공";
     }
 
     @Override

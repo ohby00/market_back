@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface UserService {
 
     // 사용자 회원가입
-    User saveUser(RegisterDTO request);
+    String saveUser(RegisterDTO request);
 
     // 사용자 삭제
     void deleteUserByUserId(long id);

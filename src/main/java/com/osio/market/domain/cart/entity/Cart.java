@@ -2,14 +2,11 @@ package com.osio.market.domain.cart.entity;
 
 import com.osio.market.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
-@Getter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,14 +14,14 @@ import java.util.List;
 @Table(name = "cart")
 public class Cart {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartId;
-    private Long cartPrice;
+    private Long cartTotalPrice;
 
     @OneToMany(mappedBy = "cart")
-    private List<CartDetail> cartDetail;
+    private List<CartProducts> cartProducts;
 
-    @OneToOne
-    @JoinColumn(name = "userId", unique =true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId // userId와 동일한 값으로 cartId 매핑
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 }

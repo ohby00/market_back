@@ -1,7 +1,7 @@
 package com.osio.market.domain.product.entity;
 
-import com.osio.market.domain.cart.entity.CartDetail;
-import com.osio.market.domain.order.entity.OrderDetail;
+import com.osio.market.domain.cart.entity.CartProducts;
+import com.osio.market.domain.order.entity.OrderProducts;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +20,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
+
     @Column(nullable = false)
     private String productName;
 
@@ -36,11 +37,11 @@ public class Product {
     private String productImage;
 
     @Column(nullable = false)
-    private Integer productStack;
+    private Integer productQuantity;
 
     @OneToMany(mappedBy = "product")
-    private List<OrderDetail> orderDetail;
+    private List<OrderProducts> orderProducts;
 
     @OneToMany(mappedBy = "product")
-    private List<CartDetail> cartDetail;
+    private List<CartProducts> cartProducts;
 }
