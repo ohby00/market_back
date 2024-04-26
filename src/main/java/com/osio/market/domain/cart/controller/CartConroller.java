@@ -1,8 +1,8 @@
 package com.osio.market.domain.cart.controller;
 
-
 import com.osio.market.domain.cart.dto.CartAddDTO;
 import com.osio.market.domain.cart.dto.CartListDTO;
+import com.osio.market.domain.cart.dto.CartUpdateDTO;
 import com.osio.market.domain.cart.entity.CartProducts;
 import com.osio.market.domain.cart.service.CartServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +24,10 @@ public class CartConroller {
 
     private final CartServiceImpl cartServiceImpl;
 
-    @GetMapping("/list/{userId}")
-    public ResponseEntity<List<CartListDTO>> getCartList(@PathVariable("userId") Long userId) {
+    @GetMapping("/list")
+    public ResponseEntity<List<CartListDTO>> getCartList(Principal principal) {
         try {
-            List<CartListDTO> cartList = cartServiceImpl.getCartList(userId);
+            List<CartListDTO> cartList = cartServiceImpl.getCartList(principal);
             return ResponseEntity.ok(cartList);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -44,6 +44,12 @@ public class CartConroller {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save cart");
         }
+    }
+
+    @PatchMapping("/update")
+    public ResponseEntity<Object> updateProductCart(@RequestBody CartUpdateDTO cartUpdateDTO, Principal principal) {
+        String result = cartServiceImpl.updateCartProduct(principal, cartUpdateDTO);
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/delete")

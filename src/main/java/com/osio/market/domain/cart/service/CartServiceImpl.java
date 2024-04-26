@@ -2,6 +2,7 @@ package com.osio.market.domain.cart.service;
 
 import com.osio.market.domain.cart.dto.CartAddDTO;
 import com.osio.market.domain.cart.dto.CartListDTO;
+import com.osio.market.domain.cart.dto.CartUpdateDTO;
 import com.osio.market.domain.cart.entity.Cart;
 import com.osio.market.domain.cart.entity.CartProducts;
 import com.osio.market.domain.cart.repository.CartProductsRepository;
@@ -29,23 +30,24 @@ public class CartServiceImpl implements CartService {
     private final UserJpaRepository userJpaRepository;
 
     @Override
-    public List<CartListDTO> getCartList(Long userId) {
-//        Optional<Cart> userId = cartRepository.findByEmail(principal.getName());
+    public List<CartListDTO> getCartList(Principal principal) {
+        Optional<User> userId = userJpaRepository.findByEmail(principal.getName());
 
         // 유저 장바구니 조회
-        Optional<Cart> cart = cartRepository.findById(userId);
-        log.info("Cart: {}", cart);
+        Optional<Cart> cart = cartRepository.findById(userId.get().getId());
 
         // 장바구니 List를 DTO로 변환하여 리스트로 반환
         List<CartProducts> cartProducts = cartProductsRepository.findAllByCart(cart);
         return cartProducts.stream()
-                .map(cartDetail -> CartListDTO.builder()
-                        .productName(cartDetail.getProduct().getProductName())
-                        .cartProductPrice(cartDetail.getCartProductPrice())
-                        .image(cartDetail.getProduct().getProductImage())
-                        .cartTotalPrice(cartDetail.getCart().getCartTotalPrice())
-                        .cartProductQuantity(cartDetail.getCartQuantity())
-                        .cartId(cartDetail.getCart().getCartId())
+                .map(cartProduct -> CartListDTO.builder()
+                        .cartProductId(cartProduct.getCartProductId())
+                        .productId(cartProduct.getProduct().getProductId())
+                        .productName(cartProduct.getProduct().getProductName())
+                        .cartProductPrice(cartProduct.getCartProductPrice())
+                        .image(cartProduct.getProduct().getProductImage())
+                        .cartProductPrice(cartProduct.getCartProductPrice())
+                        .cartProductQuantity(cartProduct.getCartQuantity())
+                        .cartId(cartProduct.getCart().getCartId())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -75,18 +77,26 @@ public class CartServiceImpl implements CartService {
         cartProducts.setCartQuantity(1L); // 장바구니 스택 설정
         cartProducts.setCartProductPrice(product.getProductPrice());
 
-
         // CartDetail 저장
         cartProductsRepository.save(cartProducts);
         return "장바구니 추가 완료";
     }
 
     @Override
-    public String updateCartProduct(Principal principal, CartAddDTO cartAddDTO) {
+    public String updateCartProduct(Principal principal, CartUpdateDTO cartUpdateDTO) {
         Optional<User> userId = userJpaRepository.findByEmail(principal.getName());
         Cart cart = cartRepository.findById(userId.get().getId()).get();
-//        CartProducts cartProducts = cartProductsRepository.findById();
-        return "";
+
+        Optional<Product> product = productRepository.findById(cartUpdateDTO.getProductId());
+
+        CartProducts cartProduct = cartProductsRepository.findByCartProductId(cartUpdateDTO.getCartProductId());
+
+        Long price = cartProduct.getCartQuantity() * product.get().getProductPrice();
+        cartProduct.setCartQuantity(cartUpdateDTO.getCartQuantity());
+        cartProduct.setCartProductPrice(price);
+        cartProductsRepository.save(cartProduct);
+
+        return "수정 완료";
     }
 
     @Override
