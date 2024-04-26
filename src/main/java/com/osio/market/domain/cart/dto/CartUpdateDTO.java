@@ -6,16 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class CartListDTO {
+@AllArgsConstructor
+@NoArgsConstructor
+public class CartUpdateDTO {
     private Long cartId;
-    private Long productId;
     private Long cartProductId;
-    private String productName;
-
-    private Long cartProductPrice;
-    private String image;
-    private Long cartProductQuantity;
+    private Long cartQuantity;
+    private Long ProductId;
 }
