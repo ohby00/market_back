@@ -19,5 +19,5 @@ public interface CartService {
     String updateCartProduct(Principal principal, CartUpdateDTO cartUpdateDTO);
 
     // 장바구니 상품 제거
-    String deleteCartProduct(Principal principal, CartProducts cartProductId);
+    String deleteCartProduct(CartProducts cartProductId, Principal principal);
 }

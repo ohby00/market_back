@@ -18,8 +18,9 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
     private Timestamp orderDate;
-    private String orderStatus;
+    private Timestamp cancledDate;
     private Long orderTotalPrice;
+    private Status status;
 
     @ManyToOne
     @JoinColumn(name="userId")
@@ -27,4 +28,9 @@ public class Orders {
 
     @OneToMany(mappedBy = "orders")
     private List<OrderProducts> orderProducts;
+
+    public void updateOrderStatus(Status orderStatus) {
+        this.status = orderStatus;
+    }
+
 }

@@ -1,11 +1,10 @@
-package com.osio.market.global.security;
+package com.osio.market.global.util.jwt;
 
 import com.osio.market.domain.user.dto.LoginDTO;
 import com.osio.market.domain.user.dto.RegisterDTO;
 import com.osio.market.domain.user.dto.TokenDTO;
 import com.osio.market.domain.user.entity.User;
 import com.osio.market.domain.user.repository.UserJpaRepository;
-import com.osio.market.global.util.jwt.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,13 +15,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class JwtLogin {
+public class JwtLoginService {
     private final UserJpaRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public JwtLogin(UserJpaRepository userRepository,
+    public JwtLoginService(UserJpaRepository userRepository,
                            PasswordEncoder passwordEncoder,
                            JwtService jwtService,
                            AuthenticationManager authenticationManager) {

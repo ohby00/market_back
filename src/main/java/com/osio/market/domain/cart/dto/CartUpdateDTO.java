@@ -13,5 +13,5 @@ public class CartUpdateDTO {
     private Long cartId;
     private Long cartProductId;
     private Long cartQuantity;
-    private Long ProductId;
+    private Long productId;
 }

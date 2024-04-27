@@ -5,7 +5,7 @@ import com.osio.market.domain.user.dto.*;
 import com.osio.market.domain.user.entity.User;
 import com.osio.market.domain.user.service.EmailService;
 import com.osio.market.domain.user.service.UserService;
-import com.osio.market.global.security.JwtLogin;
+import com.osio.market.global.util.jwt.JwtLoginService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +22,9 @@ public class UserController {
     private final UserService userService;
     private final EmailService emailService;
     private final Map<String, String> codeVerify;
-    private final JwtLogin jwtLogin;
+    private final JwtLoginService jwtLogin;
 
-    public UserController(UserService userService, EmailService emailService, JwtLogin jwtLogin) {
+    public UserController(UserService userService, EmailService emailService, JwtLoginService jwtLogin) {
         this.userService = userService;
         this.emailService = emailService;
         this.codeVerify = new HashMap<>();

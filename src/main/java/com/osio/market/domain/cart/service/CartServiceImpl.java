@@ -37,8 +37,8 @@ public class CartServiceImpl implements CartService {
         Optional<Cart> cart = cartRepository.findById(userId.get().getId());
 
         // 장바구니 List를 DTO로 변환하여 리스트로 반환
-        List<CartProducts> cartProducts = cartProductsRepository.findAllByCart(cart);
-        return cartProducts.stream()
+//        List<CartProducts> cartProducts = cartProductsRepository.findAllByCart(cart);
+        return cart.get().getCartProducts().stream()
                 .map(cartProduct -> CartListDTO.builder()
                         .cartProductId(cartProduct.getCartProductId())
                         .productId(cartProduct.getProduct().getProductId())
@@ -100,9 +100,12 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public String deleteCartProduct(Principal principal, CartProducts cartProductId) {
-        cartProductsRepository.delete(cartProductId);
-
-        return "상품 제거 완료";
+    public String deleteCartProduct(CartProducts cartProductId, Principal principal) {
+        Optional<User> userId = userJpaRepository.findByEmail(principal.getName());
+        if (cartProductsRepository.findByCartProductId(cartProductId.getCartProductId()) != null) {
+            cartProductsRepository.delete(cartProductId);
+            return "상품 제거 완료";
+        }
+        return "제거할 상품이 없습니다.";
     }
 }
