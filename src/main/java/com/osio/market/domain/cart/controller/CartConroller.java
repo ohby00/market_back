@@ -24,6 +24,9 @@ public class CartConroller {
 
     private final CartServiceImpl cartServiceImpl;
 
+    /* 장바구니 상품 조회
+         http://localhost8080/cart/list
+     */
     @GetMapping("/list")
     public ResponseEntity<List<CartListDTO>> getCartList(Principal principal) {
         try {
@@ -34,6 +37,14 @@ public class CartConroller {
         }
     }
 
+
+    /* 장바구니 상품 추가
+         http://localhost8080/cart/add
+
+         {
+        "productId": 1
+        }
+    */
     @PostMapping("/add")
     public ResponseEntity<Object> addProductCart(@RequestBody CartAddDTO cartAddDTO, Principal principal) {
         try {
@@ -46,21 +57,37 @@ public class CartConroller {
         }
     }
 
+    /* 장바구니 수량 수정
+     http://localhost8080/cart/update
+
+     {
+    "productId" : 1,
+    "cartQuantity" : 1,
+    "cartId" : 1,
+    "cartProductId" : 1
+    }
+    */
     @PatchMapping("/update")
     public ResponseEntity<Object> updateProductCart(@RequestBody CartUpdateDTO cartUpdateDTO, Principal principal) {
         String result = cartServiceImpl.updateCartProduct(principal, cartUpdateDTO);
         return ResponseEntity.ok(result);
     }
 
+
+    /* 장바구니 상품 삭제
+     http://localhost8080/cart/delete
+
+     {
+    "cartProductId" : 1
+    }
+    */
     @DeleteMapping("/delete")
-    public ResponseEntity<Object> deleteProductCart(@RequestBody CartProducts cartProducts, Principal principal) {
-        try{
-            String result = cartServiceImpl.deleteCartProduct(principal, cartProducts);
-            return ResponseEntity.ok(result);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.badRequest().body("제거할 상품이 없습니다.");
+    public ResponseEntity<String> deleteProductCart(@RequestBody CartProducts cartProducts, Principal principal) {
+        try {
+            String cartProduct = cartServiceImpl.deleteCartProduct(cartProducts, principal);
+            return ResponseEntity.ok(cartProduct);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delet cart");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete cart");
         }
     }
 }

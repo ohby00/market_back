@@ -1,11 +1,9 @@
 package com.osio.market.global.util.jwt;
 
 import com.osio.market.domain.user.dto.*;
-import com.osio.market.global.security.JwtLogin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.token.TokenService;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/jwt")
@@ -23,7 +21,7 @@ public class JwtController {
 
 
     @Autowired
-    JwtLogin jwtLogin;
+    JwtLoginService jwtLogin;
 
     @PostMapping("/login")
     public ResponseEntity<TokenDTO> jwtLogin(@RequestBody LoginDTO loginDTO) {
