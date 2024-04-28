@@ -102,12 +102,4 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
-    @PostMapping("/login")
-    public ResponseEntity<TokenDTO> login(
-            @RequestBody LoginDTO request
-    ){
-        TokenDTO token = jwtLogin.login(request);
-        return ResponseEntity.ok(token);
-    }
 }

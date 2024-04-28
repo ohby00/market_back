@@ -6,18 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/jwt")
+@RequestMapping("/token")
 @RestController
 @CrossOrigin
 @Slf4j
 public class JwtController {
-    /*
-    http://localhost:8080/jwt/login
-    {
-    "email" : "quddnr217@naver.com",
-    "password" : "1234"
-    }
-     */
 
 
     @Autowired
@@ -28,7 +21,7 @@ public class JwtController {
         return ResponseEntity.ok(jwtLogin.login(loginDTO));
     }
 
-    @GetMapping("/page")
+    @GetMapping("/myPage")
     public ResponseEntity<RegisterDTO> jwtMyPage(@RequestHeader("Authorization") String access) {
         // Authorization 헤더에서 토큰 추출
         String accessToken = access.replace("Bearer ", "");
