@@ -18,18 +18,20 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
     private Timestamp orderDate;
-    private Timestamp cancelDate;
+    private Timestamp refundDate;
     private Long orderTotalPrice;
+
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @ManyToOne
     @JoinColumn(name="userId")
     private User user;
 
-    @OneToMany(mappedBy = "orders", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "orders", fetch = FetchType.EAGER)
     private List<OrderProducts> orderProducts;
 
-    public void updateOrderStatus(Status orderStatus) {
+    public void updateStatus(Status orderStatus) {
         this.status = orderStatus;
     }
 
