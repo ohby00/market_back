@@ -69,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
 
 
 
-    // 주문 번호 1의 상품 조회 (작동 안함)
+    // 주문 번호 1의 상품 조회
     @Override
     public List<OrderProductsListDTO> getOrderProductsList(Long orderId, Principal principal) {
         User user = findUserByEmail(principal);
@@ -111,8 +111,13 @@ public class OrderServiceImpl implements OrderService {
                 .orderProductPrice(product.getProductPrice() * orderProductQuantity.getOrderProductQuantityDTO())
                 .build();
 
-        // 주문 생성
-        Timestamp orderDate = new Timestamp(System.currentTimeMillis());
+        // 현재 날짜와 시간을 가져옵니다.
+        LocalDateTime now = LocalDateTime.now();
+
+        // LocalDateTime 객체를 Timestamp 객체로 변환합니다.
+        Timestamp orderDate = Timestamp.valueOf(now);
+        log.info("orderDate={}",orderDate);
+
         Orders order = Orders.builder()
                 .user(user)
                 .status(Status.READY_TO_SHIPPING)
@@ -142,9 +147,10 @@ public class OrderServiceImpl implements OrderService {
             LocalDateTime orderDate = order.getOrderDate().toLocalDateTime();
             long days = java.time.Duration.between(orderDate, now).toDays();
             if (order.getStatus() != Status.CANCELED && order.getStatus() != Status.REFUND) {
-                if (days == 1) {
+                long daysInteger = (long) Math.floor(days); // 소수점을 내림하여 정수로 변환
+                if (daysInteger == 1) { // 1일
                     order.updateOrderStatus(Status.SHIPPING);
-                } else if (days >= 2) {
+                } else if (daysInteger == 2) { // 2일
                     order.updateOrderStatus(Status.DELIVERED);
                 }
             }
