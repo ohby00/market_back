@@ -10,21 +10,26 @@ import com.osio.market.domain.order.reposiroty.OrderProductRepository;
 import com.osio.market.domain.order.reposiroty.OrderRepository;
 import com.osio.market.domain.product.entity.Product;
 import com.osio.market.domain.product.repository.ProductRepository;
+import com.osio.market.domain.product.service.ProductService;
 import com.osio.market.domain.user.entity.User;
 import com.osio.market.domain.user.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 @Service
 @Slf4j
@@ -35,6 +40,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserJpaRepository userJpaRepository;
     private final ProductRepository productRepository;
     private final OrderProductRepository orderProductRepository;
+    private final ProductService productService;
 
     // 리팩토링 완료
     private User findUserByEmail(Principal principal) {
@@ -112,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
 
         // LocalDateTime 객체를 Timestamp 객체로 변환합니다.
         Timestamp orderDate = Timestamp.valueOf(now);
-        log.info("orderDate={}",orderDate);
+        log.info("orderDate={}", orderDate);
 
         Orders order = Orders.builder()
                 .user(user)
@@ -131,41 +137,102 @@ public class OrderServiceImpl implements OrderService {
         return "주문 완료";
     }
 
+    @Override
+    public String canceledOrder(Long orderId, Principal principal) {
+        User user = findUserByEmail(principal);
+        Optional<Orders> order = orderRepository.findById(orderId);
+        List<OrderProducts> orderProducts = order.get().getOrderProducts();
+
+        if (order.get().getStatus() != Status.CANCELED && order.get().getStatus() == Status.READY_TO_SHIPPING) {
+            for (OrderProducts orderProduct : orderProducts) {
+                Optional<Product> product = productService.findById(orderProduct.getProduct().getProductId());
+
+                long orderedQuantity = orderProduct.getOrderProductQuantity();
+                long productQuantity = product.get().getProductQuantity();
+
+                long updatedQuantity = productQuantity + orderedQuantity;
+                product.get().setProductQuantity((int) updatedQuantity);
+                productRepository.save(product.get());
+            }
+            order.get().updateStatus(Status.CANCELED);
+            return "주문 취소 완료";
+        } return "주문 취소 불가";
+    }
+
+//    @Override
+//    public String refundOrder(Long orderId, Principal principal) {
+//        User user = findUserByEmail(principal);
+//        Optional<Orders> order = orderRepository.findById(orderId);
+//        List<OrderProducts> orderProducts = order.get().getOrderProducts();
+//
+//
+//        if (order.get().getStatus() != Status.REFUND && order.get().getStatus() == Status.) {
+//            for (OrderProducts orderProduct : orderProducts) {
+//                Optional<Product> product = productService.findById(orderProduct.getProduct().getProductId());
+//
+//                long orderedQuantity = orderProduct.getOrderProductQuantity();
+//                long productQuantity = product.get().getProductQuantity();
+//
+//                long updatedQuantity = productQuantity + orderedQuantity;
+//                product.get().setProductQuantity((int) updatedQuantity);
+//                productRepository.save(product.get());
+//
+//                order.get().updateStatus(Status.CANCELED);
+//            }
+//
+//            return "주문 취소 완료";
+//        } return "주문 취소 불가";
+//    }
+
+
     // 주문 상태 변경
     @Override
     @Transactional
     public void updateOrderStatus() {
         List<Orders> orders = orderRepository.findAll();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(); // 현재 시간
+
         for (Orders order : orders) {
             LocalDateTime orderDate = order.getOrderDate().toLocalDateTime();
-            long days = java.time.Duration.between(orderDate, now).toDays();
+
+            // 날짜 차이
+            long days = Duration.between(orderDate, now).toDays();
             if (order.getStatus() != Status.CANCELED && order.getStatus() != Status.REFUND) {
-                long daysInteger = (long) Math.floor(days); // 소수점을 내림하여 정수로 변환
-                if (daysInteger == 1) { // 1일
-                    order.updateOrderStatus(Status.SHIPPING);
-                } else if (daysInteger == 2) { // 2일
-                    order.updateOrderStatus(Status.DELIVERED);
+                if (days == 1) { // 1일
+                    order.updateStatus(Status.SHIPPING);
+                } else if (days == 2) { // 2일
+                    order.updateStatus(Status.DELIVERED);
                 }
             }
         }
     }
 
-    @Override
-    public String canceledOrder(Long orderId, Principal principal) {
-        User user = findUserByEmail(principal);
-        Optional<Orders> orderOptional = orderRepository.findById(orderId);
 
-        if (orderOptional.isPresent()) {
-            Orders order = orderOptional.get();
-            if (order.getUser().equals(user) && order.getStatus().equals(Status.READY_TO_SHIPPING)) {
-                order.updateOrderStatus(Status.CANCELED);
-                return "주문 취소 완료";
-            } else {
-                return "주문 취소 불가";
-            }
-        } else {
-            return "주문 내역이 없습니다.";
-        }
-    }
+
+    // 반품 상태 변경
+//    @Override
+//    @Transactional
+//    public void updateRefundOrder() {
+//        List<Orders> orders = orderRepository.findAll();
+//        LocalDateTime now = LocalDateTime.now(); // 현재 시간
+//
+//        for (Orders order : orders) {
+//            LocalDateTime orderDate = order.getOrderDate().toLocalDateTime();
+//
+//            // 날짜 차이
+//            long days = Duration.between(orderDate, now).toDays();
+//            if (order.getStatus() != Status.CANCELED && order.getStatus() != Status.REFUND) {
+//                if (days == 1) { // 1일
+//                    order.updateStatus(Status.SHIPPING);
+//                } else if (days == 2) { // 2일
+//                    order.updateStatus(Status.DELIVERED);
+//                }
+//            }
+//        }
+//    }
+
 }
+
+
+
+

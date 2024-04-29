@@ -3,9 +3,13 @@ package com.osio.market.domain.order.controller;
 import com.osio.market.domain.order.dto.OrderProductQuantityDTO;
 import com.osio.market.domain.order.dto.OrderProductsListDTO;
 import com.osio.market.domain.order.dto.OrdersListDTO;
+import com.osio.market.domain.order.entity.Orders;
+import com.osio.market.domain.order.reposiroty.OrderRepository;
 import com.osio.market.domain.order.service.OrderServiceImpl;
 import com.osio.market.domain.product.entity.Product;
 import com.osio.market.domain.product.service.ProductService;
+import com.osio.market.domain.user.entity.User;
+import com.osio.market.domain.user.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/order")
@@ -25,6 +30,8 @@ public class OrderController {
 
     private final OrderServiceImpl orderServiceImpl;
     private final ProductService productService;
+    private final UserJpaRepository userJpaRepository;
+    private final OrderRepository orderRepository;
 
     @GetMapping("/list")
     public ResponseEntity<List<OrdersListDTO>> getOrdersList(Principal principal) {
@@ -36,7 +43,7 @@ public class OrderController {
         }
     }
 
-    // 주문 번호 1의 상품 조회
+    // 주문 추가
     @PostMapping("/add/{productId}")
     public ResponseEntity<String> addOrder(@RequestBody OrderProductQuantityDTO orderProductQuantity, @PathVariable("productId") Long productId, Principal principal) {
         try {
@@ -71,12 +78,35 @@ public class OrderController {
     }
 
 
+//    @PostMapping("http://localhost:8080/order/product/list/{orderId}")
+//    public List<OrderProductsListDTO> getOrderProductsList(Long orderId, Principal principal) {
+//
+//        Optional<User> findUser = userJpaRepository.findByEmail(principal.getName());
+//        Optional<Orders> orders = orderRepository.findById(orderId);
+//        log.info("orders={}", orders);
+//
+////       List<OrderProducts> orderProducts = orderProductRepository.findByOrderId(findUser);
+////        log.info("orderProducts ={}", orderProducts);
+//
+//        return orders.get().getOrderProducts().stream()
+//                .map(orderProduct -> OrderProductsListDTO.builder()
+//                        .orderProductId(orderProduct.getOrderProductsId())
+//                        .orderProductQuantity(orderProduct.getOrderProductQuantity())
+//                        .orderProductPrice(orderProduct.getOrderProductPrice())
+//                        .build())
+//                .collect(Collectors.toList());
+//    }
 
-
-    // 주문 추가 (장바구니 상품이 아닌 상품 직접 구매)
-    @DeleteMapping("/delete/{orderId}")
+    // 주문 취소 (DeleteMapping하면 주문이 사라지므로 PostMapping으로 상태만 변경)
+    @PostMapping("/cancel/{orderId}")
     public ResponseEntity<String> canceledOrder(@PathVariable("orderId") Long orderId, Principal principal) {
             String order = orderServiceImpl.canceledOrder(orderId, principal);
             return ResponseEntity.ok(order);
     }
+
+//    @PostMapping("/refund/{orderId}")
+//    public ResponseEntity<String> refundOrder(@PathVariable("orderId") Long orderId, Principal principal) {
+//        String order = orderServiceImpl.refundOrder(orderId, principal);
+//        return ResponseEntity.ok(order);
+//    }
 }
