@@ -37,11 +37,19 @@ public class Product {
     private String productImage;
 
     @Column(nullable = false)
-    private Integer productQuantity;
+    private int productQuantity;
 
     @OneToMany(mappedBy = "product")
     private List<OrderProducts> orderProducts;
 
     @OneToMany(mappedBy = "product")
     private List<CartProducts> cartProducts;
+
+    public int getStock() {
+        return this.productQuantity;
+    }
+
+    public void setProductQuantity(int updatedQuantity) {
+        this.productQuantity = updatedQuantity;
+    }
 }

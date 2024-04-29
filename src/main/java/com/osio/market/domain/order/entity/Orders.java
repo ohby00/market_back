@@ -18,7 +18,7 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
     private Timestamp orderDate;
-    private Timestamp cancledDate;
+    private Timestamp cancelDate;
     private Long orderTotalPrice;
     private Status status;
 
@@ -26,7 +26,7 @@ public class Orders {
     @JoinColumn(name="userId")
     private User user;
 
-    @OneToMany(mappedBy = "orders")
+    @OneToMany(mappedBy = "orders", fetch = FetchType.LAZY)
     private List<OrderProducts> orderProducts;
 
     public void updateOrderStatus(Status orderStatus) {
