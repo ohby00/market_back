@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,6 +42,16 @@ public class ProductServiceImpl implements ProductService {
         ).collect(Collectors.toList());
 
         return list;
+    }
+
+    @Override
+    public Optional<Product> findById(Long productId) {
+        return productRepository.findById(productId);
+    }
+
+    @Override
+    public void save(Product product) {
+        productRepository.save(product);
     }
 
     /* 상품 상세 조회

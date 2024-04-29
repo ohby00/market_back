@@ -103,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
         // 주문 상품 생성
         OrderProducts orderProduct = OrderProducts.builder()
                 .product(product)
-                .orderProductQuantity(orderProductQuantity.getOrderProductQuantityDTO())
+                .orderProductQuantity((long) orderProductQuantity.getOrderProductQuantityDTO())
                 .orderProductPrice(product.getProductPrice() * orderProductQuantity.getOrderProductQuantityDTO())
                 .build();
 
