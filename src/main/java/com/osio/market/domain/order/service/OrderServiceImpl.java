@@ -99,31 +99,37 @@ public class OrderServiceImpl implements OrderService {
         User user = findUserByEmail(principal);
 
         // 주문 상품을 DB에 저장
-        Product product = productRepository.findById(productId).get();
+        Product product = productRepository.findById(productId).orElse(null); // 상품이 없을 경우 처리
+        if (product == null) {
+            return "상품을 찾을 수 없습니다.";
+        }
+
+        // 주문 상품 생성
         OrderProducts orderProduct = OrderProducts.builder()
                 .product(product)
                 .orderProductQuantity(orderProductQuantity.getOrderProductQuantityDTO())
                 .orderProductPrice(product.getProductPrice() * orderProductQuantity.getOrderProductQuantityDTO())
                 .build();
-        orderProductRepository.save(orderProduct);
 
+        // 주문 생성
         Timestamp orderDate = new Timestamp(System.currentTimeMillis());
-
-        // 주문을 DB에 저장
         Orders order = Orders.builder()
                 .user(user)
                 .status(Status.READY_TO_SHIPPING)
-                .orderTotalPrice(productRepository.findById(productId).get().getProductPrice() * orderProductQuantity.getOrderProductQuantityDTO())
+                .orderTotalPrice(orderProduct.getOrderProductPrice()) // 주문 상품 가격으로 설정
                 .orderDate(orderDate)
                 .build();
+
+        // 주문 저장
         orderRepository.save(order);
 
-        // 주문 정보의 ID를 얻어온 후에 해당 ID로 주문 상품 정보에 연결
+        // 주문 상품과 주문의 관계 설정 후 저장
         orderProduct.setOrder(order);
         orderProductRepository.save(orderProduct);
 
         return "주문 완료";
     }
+
 
 
     // 주문 상태 변경
@@ -148,14 +154,18 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String canceledOrder(Long orderId, Principal principal) {
         User user = findUserByEmail(principal);
-        Orders order = orderRepository.findById(orderId).get();
-//        if (orderId.equals(order.getOrderId())) {
-        if (order.getStatus().equals(Status.READY_TO_SHIPPING)) {
-            order.updateOrderStatus(Status.CANCELED);
-            return "주문 취소 완료";
+        Optional<Orders> orderOptional = orderRepository.findById(orderId);
+
+        if (orderOptional.isPresent()) {
+            Orders order = orderOptional.get();
+            if (order.getUser().equals(user) && order.getStatus().equals(Status.READY_TO_SHIPPING)) {
+                order.updateOrderStatus(Status.CANCELED);
+                return "주문 취소 완료";
+            } else {
+                return "주문 취소 불가";
+            }
         } else {
-            return "주문 취소 불가";
+            return "주문 내역이 없습니다.";
         }
-//        } return "주문 내역이 없습니다.";
     }
 }
