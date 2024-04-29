@@ -24,4 +24,9 @@ public class OrderProducts {
     @ManyToOne
     @JoinColumn(name="orderId")
     private Orders orders;
+
+    public void setOrder(Orders order) {
+        this.orders = order;
+    }
+
 }
