@@ -68,7 +68,7 @@ public class OrderController {
     /*
         http://localhost8080/order/delete/1
     */
-    @PostMapping("/delete/{orderId}")
+    @DeleteMapping("/delete/{orderId}")
     public ResponseEntity<String> canceledOrder(@PathVariable("orderId") Long orderId, Principal principal) {
             String order = orderServiceImpl.canceledOrder(orderId, principal);
             return ResponseEntity.ok(order);
