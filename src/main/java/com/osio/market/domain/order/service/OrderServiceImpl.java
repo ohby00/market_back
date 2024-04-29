@@ -61,13 +61,10 @@ public class OrderServiceImpl implements OrderService {
                     .collect(Collectors.toList());
         } else {
             // 사용자를 찾을 수 없는 경우에 대한 처리
-            // 예외를 throw하거나 빈 리스트를 반환할 수 있음
+            // 예외를 throw, 빈 리스트를 반환할 수 있음
             return Collections.emptyList();
         }
     }
-
-
-
 
     // 주문 번호 1의 상품 조회
     @Override
@@ -87,10 +84,9 @@ public class OrderServiceImpl implements OrderService {
         } else {
             // 주어진 orderId에 해당하는 주문이 존재하지 않음
             // 예외 처리 또는 다른 작업 수행
-            return Collections.emptyList(); // 또는 예외를 throw할 수 있음
+            return Collections.emptyList(); // 또는 예외를 throw
         }
     }
-
 
     // 주문 추가 (장바구니 상품이 아닌 상품 직접 구매)
     @Override
@@ -134,8 +130,6 @@ public class OrderServiceImpl implements OrderService {
 
         return "주문 완료";
     }
-
-
 
     // 주문 상태 변경
     @Override
