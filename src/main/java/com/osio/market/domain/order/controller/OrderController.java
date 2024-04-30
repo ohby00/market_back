@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,18 +81,10 @@ public class OrderController {
     }
 
 
-    // 주문 추가 (장바구니 상품이 아닌 상품 직접 구매)
-    @DeleteMapping("/delete/{orderId}")
-    public ResponseEntity<String> canceledOrder(@PathVariable("orderId") Long orderId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String order = orderServiceImpl.canceledOrder(orderId);
-        return ResponseEntity.ok(order);
-
-
     // 주문 취소 (DeleteMapping하면 주문이 사라지므로 PostMapping으로 상태만 변경)
     @PostMapping("/cancel/{orderId}")
-    public ResponseEntity<String> canceledOrder(@PathVariable("orderId") Long orderId, Principal principal) {
-            String order = orderServiceImpl.canceledOrder(orderId, principal);
+    public ResponseEntity<String> canceledOrder(@PathVariable("orderId") Long orderId) {
+            String order = orderServiceImpl.canceledOrder(orderId);
             return ResponseEntity.ok(order);
 
     }

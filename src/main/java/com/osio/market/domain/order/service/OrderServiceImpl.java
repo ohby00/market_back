@@ -167,7 +167,7 @@ public class OrderServiceImpl implements OrderService {
         if (orderOptional.isPresent()) {
             Orders order = orderOptional.get();
             if (order.getUser().equals(user) && order.getStatus().equals(Status.READY_TO_SHIPPING)) {
-                order.updateOrderStatus(Status.CANCELED);
+                order.updateStatus(Status.CANCELED);
                 return "주문 취소 완료";
             } else {
                 return "주문 취소 불가";
