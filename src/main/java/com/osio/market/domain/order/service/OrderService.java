@@ -9,13 +9,13 @@ import java.security.Principal;
 import java.util.List;
 
 public interface OrderService {
-    List<OrderProductsListDTO> getOrderProductsList(Long orderId, Principal principal);
+    List<OrderProductsListDTO> getOrderProductsList(Long orderId);
 
-    String addOrder(OrderProductQuantityDTO orderProductQuantity, Long productId, Principal principal);
+    String addOrder(OrderProductQuantityDTO orderProductQuantity, Long productId);
 
-    String canceledOrder(Long orders,Principal principal);
+    String canceledOrder(Long orders);
 
-    List<OrdersListDTO> getOrdersList(Principal principal);
+    List<OrdersListDTO> getOrdersList();
 
     @Transactional
     void updateOrderStatus();

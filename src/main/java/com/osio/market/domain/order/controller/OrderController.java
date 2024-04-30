@@ -1,7 +1,6 @@
 package com.osio.market.domain.order.controller;
 
 import com.osio.market.domain.order.dto.OrderProductQuantityDTO;
-import com.osio.market.domain.order.dto.OrderProductsListDTO;
 import com.osio.market.domain.order.dto.OrdersListDTO;
 import com.osio.market.domain.order.service.OrderServiceImpl;
 import com.osio.market.domain.product.entity.Product;
@@ -10,9 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,18 +27,30 @@ public class OrderController {
     private final ProductService productService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<OrdersListDTO>> getOrdersList(Principal principal) {
-        try{
-            List<OrdersListDTO> orderList = orderServiceImpl.getOrdersList(principal);
+    public ResponseEntity<List<OrdersListDTO>> getOrdersList() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            List<OrdersListDTO> orderList = orderServiceImpl.getOrdersList();
             return ResponseEntity.ok(orderList);
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
     // 주문 번호 1의 상품 조회
+    @GetMapping("/add/{productId}")
+    public ResponseEntity<Product> getProductById(@PathVariable("productId") Long productId) {
+        try {
+            Optional<Product> productOptional = productService.findById(productId);
+            return productOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @PostMapping("/add/{productId}")
-    public ResponseEntity<String> addOrder(@RequestBody OrderProductQuantityDTO orderProductQuantity, @PathVariable("productId") Long productId, Principal principal) {
+    public ResponseEntity<String> addOrder(@RequestBody OrderProductQuantityDTO orderProductQuantity, @PathVariable("productId") Long productId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
             // 상품 정보 조회
             Optional<Product> productOptional = productService.findById(productId);
@@ -57,7 +69,7 @@ public class OrderController {
             }
 
             // 주문 생성
-            String order = orderServiceImpl.addOrder(orderProductQuantity, productId, principal);
+            String order = orderServiceImpl.addOrder(orderProductQuantity, productId);
 
             // 상품의 재고에서 주문된 수량 차감
             int updatedQuantity = availableQuantity - orderedQuantity;
@@ -71,12 +83,11 @@ public class OrderController {
     }
 
 
-
-
     // 주문 추가 (장바구니 상품이 아닌 상품 직접 구매)
     @DeleteMapping("/delete/{orderId}")
-    public ResponseEntity<String> canceledOrder(@PathVariable("orderId") Long orderId, Principal principal) {
-            String order = orderServiceImpl.canceledOrder(orderId, principal);
-            return ResponseEntity.ok(order);
+    public ResponseEntity<String> canceledOrder(@PathVariable("orderId") Long orderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String order = orderServiceImpl.canceledOrder(orderId);
+        return ResponseEntity.ok(order);
     }
 }

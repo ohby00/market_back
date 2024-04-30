@@ -14,6 +14,8 @@ import com.osio.market.domain.user.entity.User;
 import com.osio.market.domain.user.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,40 +38,33 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final OrderProductRepository orderProductRepository;
 
-    // 리팩토링 완료
-    private User findUserByEmail(Principal principal) {
-        String userEmail = principal.getName();
+    // 사용자 인증 정보를 가져오는 메서드
+    private User findUserByEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
         return userJpaRepository.findByEmail(userEmail).orElseThrow(()
                 -> new UsernameNotFoundException("User not found with email: " + userEmail));
     }
 
     // 주문 조회
     @Override
-    public List<OrdersListDTO> getOrdersList(Principal principal) {
-        Optional<User> userOptional = Optional.ofNullable(findUserByEmail(principal));
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return user.getOrders().stream()
-                    .map(orders -> OrdersListDTO.builder()
-                            .orderId(orders.getOrderId())
-                            .userId(orders.getUser().getId())
-                            .orderDate(orders.getOrderDate())
-                            .orderTotalPrice(orders.getOrderTotalPrice())
-                            .status(orders.getStatus())
-                            .build())
-                    .collect(Collectors.toList());
-        } else {
-            // 사용자를 찾을 수 없는 경우에 대한 처리
-            // 예외를 throw, 빈 리스트를 반환할 수 있음
-            return Collections.emptyList();
-        }
+    public List<OrdersListDTO> getOrdersList() {
+        User user = findUserByEmail();
+        return user.getOrders().stream()
+                .map(orders -> OrdersListDTO.builder()
+                        .orderId(orders.getOrderId())
+                        .userId(orders.getUser().getId())
+                        .orderDate(orders.getOrderDate())
+                        .orderTotalPrice(orders.getOrderTotalPrice())
+                        .status(orders.getStatus())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     // 주문 번호 1의 상품 조회
     @Override
-    public List<OrderProductsListDTO> getOrderProductsList(Long orderId, Principal principal) {
-        User user = findUserByEmail(principal);
+    public List<OrderProductsListDTO> getOrderProductsList(Long orderId) {
+        User user = findUserByEmail();
         Optional<Orders> ordersOptional = orderRepository.findById(orderId);
 
         if (ordersOptional.isPresent()) {
@@ -91,8 +86,8 @@ public class OrderServiceImpl implements OrderService {
     // 주문 추가 (장바구니 상품이 아닌 상품 직접 구매)
     @Override
     @Transactional
-    public String addOrder(OrderProductQuantityDTO orderProductQuantity, Long productId, Principal principal) {
-        User user = findUserByEmail(principal);
+    public String addOrder(OrderProductQuantityDTO orderProductQuantity, Long productId) {
+        User user = findUserByEmail();
 
         // 주문 상품을 DB에 저장
         Product product = productRepository.findById(productId).orElse(null); // 상품이 없을 경우 처리
@@ -131,6 +126,7 @@ public class OrderServiceImpl implements OrderService {
         return "주문 완료";
     }
 
+
     // 주문 상태 변경
     @Override
     @Transactional
@@ -152,8 +148,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public String canceledOrder(Long orderId, Principal principal) {
-        User user = findUserByEmail(principal);
+    public String canceledOrder(Long orderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        User user = userJpaRepository.findByEmail(userEmail).orElseThrow(()
+                -> new UsernameNotFoundException("User not found with email: " + userEmail));
+
         Optional<Orders> orderOptional = orderRepository.findById(orderId);
 
         if (orderOptional.isPresent()) {
@@ -168,4 +168,5 @@ public class OrderServiceImpl implements OrderService {
             return "주문 내역이 없습니다.";
         }
     }
+
 }
