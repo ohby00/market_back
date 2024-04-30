@@ -15,8 +15,9 @@ import com.osio.market.domain.user.entity.User;
 import com.osio.market.domain.user.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,40 +43,33 @@ public class OrderServiceImpl implements OrderService {
     private final OrderProductRepository orderProductRepository;
     private final ProductService productService;
 
-    // 리팩토링 완료
-    private User findUserByEmail(Principal principal) {
-        String userEmail = principal.getName();
+    // 사용자 인증 정보를 가져오는 메서드
+    private User findUserByEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
         return userJpaRepository.findByEmail(userEmail).orElseThrow(()
                 -> new UsernameNotFoundException("User not found with email: " + userEmail));
     }
 
     // 주문 조회
     @Override
-    public List<OrdersListDTO> getOrdersList(Principal principal) {
-        Optional<User> userOptional = Optional.ofNullable(findUserByEmail(principal));
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return user.getOrders().stream()
-                    .map(orders -> OrdersListDTO.builder()
-                            .orderId(orders.getOrderId())
-                            .userId(orders.getUser().getId())
-                            .orderDate(orders.getOrderDate())
-                            .orderTotalPrice(orders.getOrderTotalPrice())
-                            .status(orders.getStatus())
-                            .build())
-                    .collect(Collectors.toList());
-        } else {
-            // 사용자를 찾을 수 없는 경우에 대한 처리
-            // 예외를 throw, 빈 리스트를 반환할 수 있음
-            return Collections.emptyList();
-        }
+    public List<OrdersListDTO> getOrdersList() {
+        User user = findUserByEmail();
+        return user.getOrders().stream()
+                .map(orders -> OrdersListDTO.builder()
+                        .orderId(orders.getOrderId())
+                        .userId(orders.getUser().getId())
+                        .orderDate(orders.getOrderDate())
+                        .orderTotalPrice(orders.getOrderTotalPrice())
+                        .status(orders.getStatus())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     // 주문 번호 1의 상품 조회
     @Override
-    public List<OrderProductsListDTO> getOrderProductsList(Long orderId, Principal principal) {
-        User user = findUserByEmail(principal);
+    public List<OrderProductsListDTO> getOrderProductsList(Long orderId) {
+        User user = findUserByEmail();
         Optional<Orders> ordersOptional = orderRepository.findById(orderId);
 
         if (ordersOptional.isPresent()) {
@@ -97,8 +91,8 @@ public class OrderServiceImpl implements OrderService {
     // 주문 추가 (장바구니 상품이 아닌 상품 직접 구매)
     @Override
     @Transactional
-    public String addOrder(OrderProductQuantityDTO orderProductQuantity, Long productId, Principal principal) {
-        User user = findUserByEmail(principal);
+    public String addOrder(OrderProductQuantityDTO orderProductQuantity, Long productId) {
+        User user = findUserByEmail();
 
         // 주문 상품을 DB에 저장
         Product product = productRepository.findById(productId).orElse(null); // 상품이 없을 경우 처리
@@ -137,53 +131,6 @@ public class OrderServiceImpl implements OrderService {
         return "주문 완료";
     }
 
-    @Override
-    public String canceledOrder(Long orderId, Principal principal) {
-        User user = findUserByEmail(principal);
-        Optional<Orders> order = orderRepository.findById(orderId);
-        List<OrderProducts> orderProducts = order.get().getOrderProducts();
-
-        if (order.get().getStatus() != Status.CANCELED && order.get().getStatus() == Status.READY_TO_SHIPPING) {
-            for (OrderProducts orderProduct : orderProducts) {
-                Optional<Product> product = productService.findById(orderProduct.getProduct().getProductId());
-
-                long orderedQuantity = orderProduct.getOrderProductQuantity();
-                long productQuantity = product.get().getProductQuantity();
-
-                long updatedQuantity = productQuantity + orderedQuantity;
-                product.get().setProductQuantity((int) updatedQuantity);
-                productRepository.save(product.get());
-            }
-            order.get().updateStatus(Status.CANCELED);
-            return "주문 취소 완료";
-        } return "주문 취소 불가";
-    }
-
-//    @Override
-//    public String refundOrder(Long orderId, Principal principal) {
-//        User user = findUserByEmail(principal);
-//        Optional<Orders> order = orderRepository.findById(orderId);
-//        List<OrderProducts> orderProducts = order.get().getOrderProducts();
-//
-//
-//        if (order.get().getStatus() != Status.REFUND && order.get().getStatus() == Status.) {
-//            for (OrderProducts orderProduct : orderProducts) {
-//                Optional<Product> product = productService.findById(orderProduct.getProduct().getProductId());
-//
-//                long orderedQuantity = orderProduct.getOrderProductQuantity();
-//                long productQuantity = product.get().getProductQuantity();
-//
-//                long updatedQuantity = productQuantity + orderedQuantity;
-//                product.get().setProductQuantity((int) updatedQuantity);
-//                productRepository.save(product.get());
-//
-//                order.get().updateStatus(Status.CANCELED);
-//            }
-//
-//            return "주문 취소 완료";
-//        } return "주문 취소 불가";
-//    }
-
 
     // 주문 상태 변경
     @Override
@@ -208,28 +155,27 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    @Override
+    public String canceledOrder(Long orderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        User user = userJpaRepository.findByEmail(userEmail).orElseThrow(()
+                -> new UsernameNotFoundException("User not found with email: " + userEmail));
 
-    // 반품 상태 변경
-//    @Override
-//    @Transactional
-//    public void updateRefundOrder() {
-//        List<Orders> orders = orderRepository.findAll();
-//        LocalDateTime now = LocalDateTime.now(); // 현재 시간
-//
-//        for (Orders order : orders) {
-//            LocalDateTime orderDate = order.getOrderDate().toLocalDateTime();
-//
-//            // 날짜 차이
-//            long days = Duration.between(orderDate, now).toDays();
-//            if (order.getStatus() != Status.CANCELED && order.getStatus() != Status.REFUND) {
-//                if (days == 1) { // 1일
-//                    order.updateStatus(Status.SHIPPING);
-//                } else if (days == 2) { // 2일
-//                    order.updateStatus(Status.DELIVERED);
-//                }
-//            }
-//        }
-//    }
+        Optional<Orders> orderOptional = orderRepository.findById(orderId);
+
+        if (orderOptional.isPresent()) {
+            Orders order = orderOptional.get();
+            if (order.getUser().equals(user) && order.getStatus().equals(Status.READY_TO_SHIPPING)) {
+                order.updateOrderStatus(Status.CANCELED);
+                return "주문 취소 완료";
+            } else {
+                return "주문 취소 불가";
+            }
+        } else {
+            return "주문 내역이 없습니다.";
+        }
+    }
 
 }
 
